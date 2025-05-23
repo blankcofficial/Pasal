@@ -97,18 +97,9 @@
                 <p class="text-gray-800">Total Amount:</p>
                 <p id="cart-total" class="text-indigo-600">Rs. 0.00</p>
             </div>
-            <form id="checkout-form" action="https://formspree.io/f/xkgrargj" method="POST">
-                <input type="name" name="customer_name" placeholder="Your Name (for receipt)" 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm mb-4" required>
-                <input type="email" name="customer_email" placeholder="Your Email (for receipt) " 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm mb-4" required>
-                <input type="text" name="customer_address" placeholder="Your Address (for receipt) " 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm mb-4" required>
-                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Proceed to Checkout
-                </button>
-                <p class="text-xs text-gray-500 mt-2 text-center"></p>
-            </form>
+            <button id="proceed-to-checkout-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                Proceed to Checkout
+            </button>
         </div>
         <div id="empty-cart-message" class="text-center text-gray-500 flex-grow flex flex-col items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-gray-300">
@@ -170,7 +161,7 @@
                 ],
                 image: 'curd.jpg'
             },
-            {
+             {
                 id: 6, name: 'Toast', category: 'Dairy & Breakfast',
                 availableUnits: [
                     { name: '500g Tub', price: 100 },
@@ -275,7 +266,7 @@
             {
                 id: 18, name: 'Biscuits ', category: 'Snacks',
                 availableUnits: [ { name: 'Standard Pack', price: 50 } ],
-                image: 'https://cdn.pixabay.com/photo/2016/03/27/21/59/bread-1284589_640.jpg' /* Changed to a valid image */
+                image: 'https://cdn.pixabay.com/photo/2016/03/27/21/59/bread-1284589_640.jpg' 
             },
             {
                 id: 19, name: 'Noodles (WAI WAI)', category: 'Snacks',
@@ -348,7 +339,7 @@
         const cartContent = document.getElementById('cart-content');
         const emptyCartMessage = document.getElementById('empty-cart-message');
         const cartSummary = document.getElementById('cart-summary');
-        const checkoutForm = document.getElementById('checkout-form');
+        // const checkoutForm = document.getElementById('checkout-form'); // No longer needed here
 
         // Initialize the app
         function init() {
@@ -365,6 +356,21 @@
             
             // Load cart from localStorage if available
             loadCart();
+
+            // New: Handle "Proceed to Checkout" button click
+            const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
+            if (proceedToCheckoutBtn) {
+                proceedToCheckoutBtn.addEventListener('click', function() {
+                    if (cart.length === 0) {
+                        showNotification('Your cart is empty! Add some items before checkout.');
+                        return;
+                    }
+                    // Save cart to localStorage (already done in updateCart, but good to be explicit here too)
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    // Redirect to checkout page
+                    window.location.href = 'checkout.html';
+                });
+            }
         }
 
         // Render category buttons
@@ -472,13 +478,7 @@
 
         // Render a single product card
         function renderProductCard(product) {
-            // Ensure unique IDs for products (your product IDs are repeated, I'll use a combination for uniqueness)
-            // The original code had repeated IDs (e.g., id:5 for yogurt, toast, oreo). 
-            // For proper functionality, each product needs a unique ID. 
-            // I'm using product.id for data-id, but the dropdown/quantity inputs need unique IDs as well.
-            // I'll make the product IDs unique in the product array for this fix.
-            const uniqueProductId = product.id; // Assuming unique IDs after my mental note/correction below
-
+            const uniqueProductId = product.id; // Assuming unique IDs after previous fix
             return `
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 flex flex-col">
                     <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.src='${getPlaceholderImage(product.name)}'">
@@ -606,35 +606,6 @@
             document.getElementById('cart-subtotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
             document.getElementById('cart-items-count').textContent = totalItems.toFixed(0);
             document.getElementById('cart-total').textContent = `Rs. ${subtotal.toFixed(2)}`;
-            
-            // Update hidden form fields for Formspree
-            // Remove existing hidden inputs to avoid duplicates
-            checkoutForm.querySelectorAll('input[type="hidden"]').forEach(el => el.remove());
-            
-            cart.forEach((item, index) => {
-                const baseName = `item_${index + 1}_`; // Start from 1 for better readability in Formspree
-                
-                addHiddenInput(baseName + 'id', item.id);
-                addHiddenInput(baseName + 'name', item.name);
-                addHiddenInput(baseName + 'selected_unit', item.selectedUnit.name);
-                addHiddenInput(baseName + 'quantity', item.quantity);
-                addHiddenInput(baseName + 'price_per_selected_unit', item.selectedUnit.price.toFixed(2));
-                addHiddenInput(baseName + 'subtotal', (item.selectedUnit.price * item.quantity).toFixed(2));
-            });
-            
-            addHiddenInput('total_amount_payable', subtotal.toFixed(2));
-            addHiddenInput('total_items_in_cart', totalItems.toFixed(0));
-            addHiddenInput('_subject', `New Grocery Order - Total: Rs. ${subtotal.toFixed(2)}`);
-        }
-
-        // Add hidden input to form
-        function addHiddenInput(name, value) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value;
-            // Insert before the submit button for good practice, or at the end
-            checkoutForm.appendChild(input); 
         }
 
         // Render a single cart item
@@ -660,7 +631,7 @@
                                     <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>
                                 </svg>
                             </button>
-                            <button class="remove-item text-red-500 hover:text-red-700 transition-colors duration-300 ml-auto text-sm flex items-center">
+                            <button class="remove-item text-red-500 hover:text-red-700 transition-colors duration-300 ml-auto text-sm flex items-center" data-id="${item.cartItemId}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 inline-block mr-1">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -673,7 +644,6 @@
                 </div>
             `;
         }
-
 
         // Update cart item quantity
         function updateCartItemQuantity(cartItemId, newQuantity) {
@@ -697,8 +667,12 @@
         function loadCart() {
             const savedCart = localStorage.getItem('cart');
             if (savedCart) {
-                cart = JSON.parse(savedCart);
-                updateCart();
+                try {
+                    cart = JSON.parse(savedCart);
+                } catch (e) {
+                    console.error("Failed to parse cart from localStorage:", e);
+                    cart = [];
+                }
             }
         }
 
@@ -736,24 +710,6 @@
             cartSidebar.classList.remove('translate-x-0');
             cartSidebar.classList.add('translate-x-full');
         }
-
-        // Handle checkout form submission
-        checkoutForm.addEventListener('submit', function(e) {
-            if (cart.length === 0) {
-                e.preventDefault(); // Prevent form submission
-                showNotification('Your cart is empty! Add some items before checkout.');
-                return;
-            }
-            
-            showNotification('Processing your order...');
-            // Formspree will handle the actual submission and redirect.
-            // After successful submission, you might want to clear the cart in localStorage.
-            // This would typically happen on the page Formspree redirects back to.
-            // For a single page app, you could clear it here:
-            // cart = [];
-            // updateCart();
-            // closeCart(); 
-        });
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
