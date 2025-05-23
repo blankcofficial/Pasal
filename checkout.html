@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - S.K Enterprises</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        .container {
+            max-width: 800px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #a0aec0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <a href="index.html">
+                <h1 class="text-3xl font-bold tracking-tight">S.K Enterprises</h1>
+            </a>
+            <p class="text-lg mt-2 sm:mt-0">Secure Checkout</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-300 pb-3">Order Summary</h2>
+
+            <div id="checkout-cart-items" class="mb-8 custom-scrollbar overflow-y-auto max-h-96">
+                </div>
+
+            <div id="checkout-summary-totals" class="border-t border-gray-200 pt-6 space-y-3 mb-8">
+                <div class="flex justify-between items-center text-lg">
+                    <p class="font-semibold text-gray-700">Subtotal:</p>
+                    <p id="checkout-subtotal" class="font-semibold text-gray-800">Rs. 0.00</p>
+                </div>
+                <div class="flex justify-between items-center text-lg">
+                    <p class="font-semibold text-gray-700">Total Items:</p>
+                    <p id="checkout-items-count" class="font-semibold text-gray-800">0</p>
+                </div>
+                <div class="flex justify-between items-center text-2xl font-bold">
+                    <p class="text-gray-800">Total Amount:</p>
+                    <p id="checkout-total" class="text-indigo-600">Rs. 0.00</p>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-300 pb-3">Shipping Information</h2>
+
+            <form id="checkout-form" action="https://formspree.io/f/xkgrargj" method="POST" class="space-y-4">
+                <input type="text" name="customer_name" placeholder="Your Name" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
+                <input type="email" name="customer_email" placeholder="Your Email" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
+                <input type="text" name="customer_address" placeholder="Your Full Address (Street, City, Postcode)" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
+                <input type="tel" name="customer_phone" placeholder="Your Phone Number (Optional)" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mt-6">
+                    Place Order (Pay on Delivery)
+                </button>
+            </form>
+            <p class="text-sm text-gray-500 mt-4 text-center">
+                This is a cash-on-delivery system. You will pay when you receive your order.
+            </p>
+        </div>
+
+        <div id="empty-checkout-message" class="hidden text-center text-gray-500 text-xl py-10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-gray-300 mx-auto">
+                <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <p class="font-semibold">Your cart is empty!</p>
+            <p class="text-sm">Please go back to the <a href="index.html" class="text-indigo-600 hover:underline">store</a> to add items.</p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-8 mt-auto">
+        <p class="text-lg">© <span id="current-year"></span> S.K Enterprises All rights reserved.</p>
+        <p class="text-sm text-gray-400">Your friendly neighborhood online grocery store.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            const checkoutForm = document.getElementById('checkout-form');
+            const checkoutCartItemsDiv = document.getElementById('checkout-cart-items');
+            const checkoutSubtotal = document.getElementById('checkout-subtotal');
+            const checkoutItemsCount = document.getElementById('checkout-items-count');
+            const checkoutTotal = document.getElementById('checkout-total');
+            const emptyCheckoutMessage = document.getElementById('empty-checkout-message');
+            const mainContent = document.querySelector('main .bg-white'); // The main container div
+
+            let cart = [];
+
+            // Helper function to generate placeholder images if needed
+            function getPlaceholderImage(name) {
+                const query = encodeURIComponent(name);
+                return `https://placehold.co/100x100/EEE/31343C?text=${query}`;
+            }
+
+            function loadCartFromLocalStorage() {
+                const savedCart = localStorage.getItem('cart');
+                if (savedCart) {
+                    try {
+                        cart = JSON.parse(savedCart);
+                    } catch (e) {
+                        console.error("Failed to parse cart from localStorage:", e);
+                        cart = [];
+                    }
+                }
+            }
+
+            function renderCheckoutSummary() {
+                if (cart.length === 0) {
+                    mainContent.classList.add('hidden');
+                    emptyCheckoutMessage.classList.remove('hidden');
+                    return;
+                } else {
+                    mainContent.classList.remove('hidden');
+                    emptyCheckoutMessage.classList.add('hidden');
+                }
+
+                checkoutCartItemsDiv.innerHTML = cart.map(item => `
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                        <div class="flex items-center">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded mr-4" onerror="this.src='${getPlaceholderImage(item.name)}'">
+                            <div>
+                                <p class="font-medium text-gray-800">${item.name}</p>
+                                <p class="text-sm text-gray-600">${item.selectedUnit.name} x ${item.quantity}</p>
+                            </div>
+                        </div>
+                        <p class="font-semibold text-indigo-600">Rs. ${(item.selectedUnit.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                `).join('');
+
+                const subtotal = cart.reduce((sum, item) => sum + (item.selectedUnit.price * item.quantity), 0);
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+                checkoutSubtotal.textContent = `Rs. ${subtotal.toFixed(2)}`;
+                checkoutItemsCount.textContent = totalItems.toFixed(0);
+                checkoutTotal.textContent = `Rs. ${subtotal.toFixed(2)}`;
+
+                // Populate hidden inputs for Formspree
+                // Remove existing hidden inputs to avoid duplicates on re-render (though less likely on checkout page)
+                checkoutForm.querySelectorAll('input[type="hidden"]').forEach(el => el.remove());
+                
+                cart.forEach((item, index) => {
+                    const baseName = `item_${index + 1}_`; // Start from 1 for better readability in Formspree
+                    
+                    addHiddenInput(baseName + 'id', item.id);
+                    addHiddenInput(baseName + 'name', item.name);
+                    addHiddenInput(baseName + 'selected_unit', item.selectedUnit.name);
+                    addHiddenInput(baseName + 'quantity', item.quantity);
+                    addHiddenInput(baseName + 'price_per_selected_unit', item.selectedUnit.price.toFixed(2));
+                    addHiddenInput(baseName + 'subtotal', (item.selectedUnit.price * item.quantity).toFixed(2));
+                });
+                
+                addHiddenInput('total_amount_payable', subtotal.toFixed(2));
+                addHiddenInput('total_items_in_cart', totalItems.toFixed(0));
+                addHiddenInput('_subject', `New Grocery Order - Total: Rs. ${subtotal.toFixed(2)}`);
+            }
+
+            // Add hidden input to form
+            function addHiddenInput(name, value) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                checkoutForm.appendChild(input); 
+            }
+
+            // Show notification (re-used from index.html)
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-white text-gray-800 px-6 py-3 rounded-lg shadow-lg flex items-center animate-fade-in z-[70]';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2 text-green-500">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    ${message}
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            // Handle checkout form submission
+            checkoutForm.addEventListener('submit', function(e) {
+                if (cart.length === 0) {
+                    e.preventDefault(); // Prevent form submission
+                    showNotification('Your cart is empty! Cannot place an empty order.');
+                    // Redirect back to index.html if cart is empty
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                    return;
+                }
+                
+                // Formspree will handle the submission and redirection.
+                // After successful submission (Formspree's thank you page),
+                // the cart in localStorage should be cleared.
+                // This is typically done on the return URL configured in Formspree,
+                // or the user manually clears it. For this example, we'll clear it here.
+                localStorage.removeItem('cart'); // Clear cart after submission attempt
+                showNotification('Order placed successfully! Redirecting...');
+            });
+
+            // Initialize on page load
+            loadCartFromLocalStorage();
+            renderCheckoutSummary();
+        });
+    </script>
+</body>
+</html>
